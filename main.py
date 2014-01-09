@@ -1,16 +1,13 @@
 from flask import *
 from werkzeug import secure_filename
-import lib, data, os, rsa, uuid, whirlpool
+import lib, data, os, uuid, whirlpool
 
 DATA = data.MessangrPostsData()
-#print DATA
-#
+
 app = Flask(__name__)
 
 def generateUserID(ip):
 	s = ip + " " + str(uuid.uuid4())
-	
-	#s = RSA.encrypt(s)
 	return whirlpool.new(s).hexdigest()[:10]
 
 
@@ -24,6 +21,8 @@ def post_reply(post):
 		return "Error, post unidentified<br><a href='" + url_for("index") + "'>Home</a>"
 
 	message = request.form['message']
+	if len(message) < 2:
+		return "Post unsuccessfull!<br><a href='" + url_for('reply', post=post) + "'>Back to post</a>" 
 	id = escape(session['uid'])
 
 	try:
@@ -33,15 +32,13 @@ def post_reply(post):
 			fn == ""
 		else:
 			ext = fn.split('.')[-1]
-			allowed_ext = ["jpg","jpeg","png"]
+			allowed_ext = ["jpg","jpeg","png", "bmp"]
 			if not ext in allowed_ext:
 				return "Invalid File Format, only accepts '" + ' '.join(allowed_ext)  + "' received '" + ext + "'"
 
 			f.save('static/uploads/' + fn)
 	except:
 		fn = ""
-
-	print post
 
 	p = DATA.addComment(id, fn, message, post)
 
@@ -60,10 +57,8 @@ def reply(post):
 		return "Post not found<br><a href='" + url_for("index") + "'>Home</a>"
 	return render_template("posts.html", post=post, comments=comments)
 
-@app.route('/post',methods=['POST','GET'])
+@app.route('/post',methods=['POST'])
 def post():
-	if request.method == "GET":
-		return "Hello :)"
 	if not 'uid' in session:
 		session['uid'] = generateUserID(request.remote_addr)
 
@@ -100,14 +95,11 @@ def pageN(page):
 		session['uid'] = generateUserID(request.remote_addr)
 
 	global DATA
-	
-	print "getting page " + str(page)
 
 	posts = DATA.getPosts(page=page,amount=10)
 	comments = {}
 
 	for post in posts:
-		#print post
 		comments[post[3]] = DATA.getPostComments(post[4])[:2]
 	
 	return render_template("index.html", posts=posts, comments=comments)
@@ -123,27 +115,15 @@ def index():
 	comments = {}
 
 	for post in posts:
-		#print post
 		comments[post[3]] = DATA.getPostComments(post[4])[:2]
 	
 	return render_template("index.html", posts=posts, comments=comments)
 
 if __name__ == "__main__":
-	#if os.path.exists("private.pem") and os.path.exists("public.pem"):
-	#	RSA = rsa.RSAEncryption()
-	#	RSA.loadPrivate(open("private.pem").read(), open("public.pem").read())
-	#	print "Loaded."
-	#else:
-	#	RSA = rsa.RSAEncryption(generate=True)
-	#	prk = RSA.savePrivate()
-	#	puk = RSA.publishKey()
-	#	f = open("private.pem",'w')
-	#	f.write(prk)
-	#	f.close()
-	#	f = open("public.pem",'w')
-	#	f.write(puk)
-	#	f.close()
-	
-	#rint generateUserID("localhost")
 	app.secret_key = os.urandom(24)
-	app.run(host="127.0.0.1",port=8080, debug=True)
+
+	dev = False
+	if debug:
+		app.run(host="127.0.0.1",port=8080, debug=True)
+	else:
+		app.run(host="0.0.0.0", port=80, debug=False)

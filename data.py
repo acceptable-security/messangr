@@ -114,9 +114,4 @@ class MessangrPostsData:
 
 if __name__ == "__main__":
 	db = MessangrPostsData()
-	#print db.addPost("lolcopter","a.jpg","how is messangr doing today !!!!!!!!")
-	print db.getPosts(offset=2,amount=3)
-	#print db.addComment("bigdaddy","",":)))))))))))) absolutely god damn fucking amazing.","ed6dd9a5-5416-4b72-a2c2-eb55a035bf15")
-	#print db.addComment("suicidial fag","test.jpg","brb going to kill myself","ed6dd9a5-5416-4b72-a2c2-eb55a035bf15")
-	#print db.getPostComments("ed6dd9a5-5416-4b72-a2c2-eb55a035bf15")
 	pass
