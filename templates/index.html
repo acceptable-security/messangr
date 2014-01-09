@@ -1,0 +1,140 @@
+<html>
+	<head>
+		<style>
+			.name {
+				margin-left: 3px;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+			.text {
+				margin-right: 3px;
+				font-family: "Lucida Grande", sans-serif;
+			}
+			.img {
+				max-width: 30%;
+				max-height: 50%;
+				float:left;
+				margin-left: 3px;
+				margin-right: 3px;
+				margin-bottom: 3px;
+			}
+			.imgdesc {
+				font-family: Helvetica;
+			}
+			.block {
+				width: auto;
+				margin-left: 10px;
+				margin-right: 10px;
+				margin-top: 10px;
+				background-color: rgb(209, 209, 209);
+				min-height: 10px;
+				max-height: 250px;
+				box-shadow: 3px 3px 3px #888888;
+				clear:left;
+				display:block;
+				overflow:hidden;
+			}
+
+			#background {
+				background-color: rgb(235,235,235);
+				min-width: 100%;
+				min-height:100%;
+				overflow:hidden;
+				margin: 0px 0px 0px 0px;
+				display:block;
+			}
+			#titlebox {
+				margin-top: 10;
+				background-color: rgb(209, 209, 209);
+				width: 40%;
+				height: 50px;
+				box-shadow: 3px 3px 3px #888888;
+				display:inline-block;
+				text-transform: inline;
+				text-align: center;
+			}
+			#nav {
+				font-family: sans-serif;
+				font-size: 14px;
+			}
+			a:link {
+				text-decoration: none;
+				color: rgb(40,40,40);
+			}
+			a:visited {
+				text-decoration: none;
+				color: rgb(50,50,50);
+			}
+			a:hover {
+				font-style: italic;
+				color: rgb(30,30,30);
+			}
+			a:active {
+				font-style: italic;
+				color: rgb(50,50,50);
+			}
+			#title {
+				font-family:"Trebuchet MS", Helvetica, sans-serif;
+				font-size: 24px;
+				text-shadow: 0px 0px 4px #666;
+			}
+			.comment {
+				margin-left: 20%;
+				margin-right: 10px;
+				margin-top: 10px;
+				background-color: rgb(220, 220, 220);
+				height: 150px;
+				box-shadow: 3px 3px 3px #888888;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+	<div id="background">
+		<center><div id="titlebox">
+			<span id="title">Messangr</span><br>
+			<span id="nav"><a href="{{ url_for("index") }}">Home</a> - <a href="#">About</a> - <a href="/login">Login</a></span>
+		</div></center><br>
+		<div id="background">
+			<center>
+				<hr>
+				<form enctype="multipart/form-data" method="POST" action="/post">
+					<span class="text">
+						Message:<br>
+						<textarea cols="50" rows="10" name="message" id="message"></textarea><br>
+						File: <input type="file" name="file" id="file"><br>
+						<input type="submit" name="submit" value="Submit" />
+					</span>
+				</form>
+				<hr>
+			</center>
+			{% for post in posts %}
+				<div class="block">
+					<span class="name"><b>{{ post[0] }}</b></span> <span class="imgdesc"><i>{{ post[2] }}</i><a href="{{ url_for("reply", post=post[4]) }}"> >> Reply</a></span><br>
+					<a href="{{ url_for('static',filename='uploads/' + post[1]) }}"><img class="img" src="{{ url_for('static',filename='uploads/' + post[1]) }}"></img></a>
+					<span class="text">
+						{{ post[3] }}
+					</span>
+				</div>
+				{% for comment in comments[post[3]] %}
+				<div class="comment">
+					<span class="name"><b>{{ comment[0] }}</b></span> <span class="imgdesc"><i>{{ comment[2] }}</i></span><br>
+					{% if comment[1] != "" %}
+						<a href="{{ url_for('static',filename='uploads/' + comment[1]) }}"><img class="img" src="{{ url_for('static',filename='uploads/' + comment[1]) }}"></img></a>
+					{% endif %}
+					<span class="text">
+						{{ comment[3] }}
+					</span>
+				</div>
+				{% endfor %}
+			{% endfor %}
+			</div>
+			<br>
+			<hr>
+			<center>
+			<div class="nav">
+				Page 1
+			</div>
+			</center>
+		</div>
+	</body>
+</html>
